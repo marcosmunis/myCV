@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>    
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+        <!-- Compiled and minified CSS -->
+        <!-- Google: materialize css -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    
+        <title>avaliacao.com</title>
+    
+        <style>
+            header {
+                font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                padding-top: 2px;
+                padding-bottom: 2px;
+                text-align: left;
+                background-color: #4CAF50;
+                color: white;            
+            }
+            entry {
+	              width:720px;
+	              display: block;
+	              padding-top:55px;
+	              clear: both;
+	              margin-left:4px;
+            }
+            #customers {
+                font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+            }
+            #customers td, #customers th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+            #customers tr:nth-child(even){background-color: #f2f2f2;}
+            #customers tr:hover {background-color: #ddd;}
+            #customers th {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                text-align: center;
+                background-color: #4CAF50;
+                color: white;
+            }
+            h22 {
+              width:180px;
+              height: 23px;
+              text-align: left;
+              float:left;
+              padding:0;
+              margin:0;
+              clear:both;
+              font-size:22px;
+              color:#1b4491;
+              margin-bottom:-12px;
+            }
+            p22 {
+              width:500px;
+              margin-left:40px;
+              float:right;	
+            }  
+
+
+            table.scroll {
+                /* width: 100%; */ /* Optional */
+                /* border-collapse: collapse; */
+                border-spacing: 0;
+                border: 2px solid black;
+            }
+
+            table.scroll tbody,
+            table.scroll thead { 
+                display: block; 
+            }
+
+            
+            thead tr th { 
+                height: 10px;
+                line-height: 10px;
+                /* text-align: left; */
+            }
+            table.scroll tbody {
+                height: 400px;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            tbody { border-top: 1px solid black; 
+            }
+
+            tbody td, thead th {
+                /* width: 20%; */ /* Optional */
+                width: 10%;  /* Optional */
+                border-right: 1px solid black;
+                border-bottom: 1px solid black;
+                /* white-space: nowrap; */
+            }
+
+            tbody td:last-child, thead th:last-child {
+                border-right: none;
+            }
+
+
+
+        </style>  
+</head>
+
+<body>
+
+    <div class="container">
+
+        <table id="customers">
+            <tr>
+                <th>{{post.nome}}<br>{{post.areadeatuacao}}</th>
+            </tr>
+        </table>
+
+        <table id="customers">
+            <tr>
+              <td>Nome:</td>
+              <td>{{post.nome}}</td>
+            </tr>
+            <tr>
+              <td>eMail:</td>
+              <td>{{post.email}}</td>
+            </tr>
+            <tr>
+              <td>Celular:</td>
+              <td>{{post.celular}}</td>
+            </tr>
+            <tr>
+                <td>Área de atuação:</td>
+                <td>{{post.areadeatuacao}}</td>
+            </tr>
+            <tr>
+                <td>Perfil:</td>
+                <td>{{post.perfil}}</td>
+            </tr>
+            <tr>
+                <td>Histórico Profissional:</td>
+                <td>{{post.historicoprofissional}}</td>
+            </tr>
+            <tr>
+                <td>Formação:</td>
+                <td>{{post.formacao}}</td>
+            </tr>
+            <tr>
+                <td>Conhecimentos:</td>
+                <td>{{post.conhecimentos}}</td>
+            </tr>
+            <tr>
+                <td>Cursos:</td>
+                <td>{{post.cursos}}</td>
+            </tr>
+            <tr>
+                <td>Idiomas:</td>
+                <td>{{post.idiomas}}</td>
+            </tr>
+            <tr>
+                <td>Dados pessoais:</td>
+                <td>{{post.dadospessoais}}</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <div class="w3-center">
+            <a href="posts/editarcv/" class="w3-button w3-teal">Editar CV</a>
+        </div>
+
+
+        <br>
+</body>
+
+</html>

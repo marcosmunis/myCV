@@ -1,0 +1,128 @@
+#!/bin/bash
+
+modprobe ip_tables
+
+# Limpando regras ...........................................
+
+iptables -F INPUT
+iptables -F OUTPUT
+iptables -F FORWARD
+iptables -F -t filter
+iptables -F POSTROUTING -t nat
+iptables -F PREROUTING -t nat
+iptables -F OUTPUT -t nat
+iptables -F -t nat
+iptables -t nat -F
+iptables -t mangle -F
+iptables -X
+
+# Zerando contadores .......................................
+
+iptables -Z
+iptables -t nat -Z
+iptables -t mangle -Z
+
+# Ativando algumas coisas basicas do kernel ................
+
+echo 1 > /proc/sys/net/ipv4/tcp_syncookies                     # Abilitar o uso de syncookies (muito util para evitar SYN flood attacks)
+echo 0 > /proc/sys/net/ipv4/conf/all/accept_redirects          # Nao aceite redirecionar pacotes ICMP
+echo 1 > /proc/sys/net/ipv4/icmp_ignore_bogus_error_responses  # Ative a protecao contra respostas a mensagens de erro falsas
+echo 1 > /proc/sys/net/ipv4/icmp_echo_ignore_broadcasts        # Evita a peste do Smurf Attack e alguns outros de redes locais
+
+echo 0 > /proc/sys/net/ipv4/icmp_echo_ignore_all               # Permite o icmp
+
+# Configurando padrao .......................................
+
+iptables -P INPUT   DROP
+iptables -P OUTPUT  DROP
+iptables -P FORWARD DROP
+
+# Configurando chain DUMP ..................................
+
+iptables -N DUMP 
+iptables -F DUMP
+iptables -A DUMP -p tcp -j LOG --log-level debug --log-prefix "iptables: tcp: "
+iptables -A DUMP -p udp -j LOG --log-level debug --log-prefix "iptables: udp: "
+iptables -A DUMP -p tcp -j REJECT --reject-with tcp-reset
+iptables -A DUMP -p udp -j REJECT --reject-with icmp-port-unreachable
+iptables -A DUMP -j DROP
+
+# Blocking excessive syn packet ..............................
+
+# iptables -N SYN_FLOOD
+# iptables -A SYN_FLOOD  -m limit --limit 1/s --limit-burst 100 -j RETURN
+# iptables -A SYN_FLOOD  -j LOG --log-level debug --log-prefix "iptables: SYN_FLOOD: "
+# iptables -A SYN_FLOOD  -j DUMP
+# iptables -A INPUT      -p tcp --syn -j SYN_FLOOD
+
+# Permitindo loopback ........................................
+
+iptables -A INPUT  -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+# ESTABLISHED e RELATED .....................................
+
+iptables -A INPUT  -m conntrack --ctstate ESTABLISHED,RELATED      -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED,RELATED,NEW  -j ACCEPT
+
+# Permite o OUTPUT .........................................
+
+iptables -A OUTPUT -j ACCEPT
+
+# ............................................................
+#                            SSH
+# ............................................................
+
+iptables -N SSHCHAIN
+iptables -F SSHCHAIN
+iptables -A SSHCHAIN  -j LOG --log-level debug --log-prefix "iptables (sshchain): "
+iptables -A SSHCHAIN  -j ACCEPT
+
+iptables -A INPUT  -p tcp  --dport 22 -m conntrack --ctstate NEW  -j SSHCHAIN
+
+# ............................................................ 
+#  Rede de administracao
+# ............................................................ 
+
+iptables -N ADMCHAIN 
+iptables -F ADMCHAIN
+iptables -A ADMCHAIN  -j LOG --log-level debug --log-prefix "iptables (admchain): "
+iptables -A ADMCHAIN  -j ACCEPT
+
+ADMINSUBNET01="0.0.0.0/32"
+ADMINSUBNET02="10.0.0.0/8"
+
+iptables -A INPUT  -s $ADMINSUBNET01 -j ADMCHAIN
+iptables -A OUTPUT -d $ADMINSUBNET01 -j ADMCHAIN
+iptables -A INPUT  -s $ADMINSUBNET02 -j ADMCHAIN
+iptables -A OUTPUT -d $ADMINSUBNET02 -j ADMCHAIN
+
+
+##############################################
+#   LIBERANDO porta
+##############################################
+
+iptables -A INPUT -p tcp -m multiport --dport 443,8000,8001,8002 -j ACCEPT
+
+
+# Descarta pacotes invalidos ..................................
+
+iptables -A INPUT -m state --state INVALID -j DROP
+
+# bloqueia portas ..............................................
+
+iptables -A INPUT -p tcp --dport=20 -j DROP
+iptables -A INPUT -p udp --dport=20 -j DROP
+iptables -A INPUT -p tcp --dport=21 -j DROP
+iptables -A INPUT -p udp --dport=21 -j DROP
+iptables -A INPUT -p tcp --dport=23 -j DROP
+iptables -A INPUT -p udp --dport=23 -j DROP
+
+iptables -A INPUT -j DROP
+
+echo
+echo  "-----------------------------------------------------------"
+iptables -L
+echo  "-----------------------------------------------------------"
+echo
+
